@@ -1,6 +1,3 @@
 module.exports = {
-
-    'secret': 'ilovescotchyscotch',
-    'database': ''
-
+  secret: 'ilovescotchyscotch'
 };
