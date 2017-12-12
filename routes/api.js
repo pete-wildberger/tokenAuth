@@ -65,26 +65,30 @@ router.post('/authenticate', (req, res) => {
   let users = findByName(req.body.name);
   users.then(
     data => {
-      console.log('auth', data);
-      if (data.password != req.body.password) {
-        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+      if (data != undefined) {
+        console.log('auth', data);
+        if (data.password != req.body.password) {
+          res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+        } else {
+          console.log('match');
+          // if user is found and password is right
+          // create a token with only our given payload
+          // we don't want to pass in the entire user since that has the password
+          const payload = {
+            admin: data.admin
+          };
+          var token = jwt.sign(payload, config.secret, {
+            expiresIn: 600 // expires in 24 hours
+          });
+          // return the information including token as JSON
+          res.json({
+            success: true,
+            message: 'Enjoy your token!',
+            token: token
+          });
+        }
       } else {
-        console.log('match');
-        // if user is found and password is right
-        // create a token with only our given payload
-        // we don't want to pass in the entire user since that has the password
-        const payload = {
-          admin: data.admin
-        };
-        var token = jwt.sign(payload, config.secret, {
-          expiresIn: 600 // expires in 24 hours
-        });
-        // return the information including token as JSON
-        res.json({
-          success: true,
-          message: 'Enjoy your token!',
-          token: token
-        });
+        res.json({ success: false, message: 'Authentication failed. User not found.' });
       }
     },
     err => {
